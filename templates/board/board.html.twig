@@ -1,0 +1,39 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ boardName }}{% endblock %}
+
+{% block body %}
+<style>
+    .example-wrapper { margin: 1em auto; max-width: 800px; width: 95%; font: 18px/1.5 sans-serif; }
+    .example-wrapper code { background: #F5F5F5; padding: 2px 6px; }
+    #textarea {
+
+    }
+</style>
+
+    <div class="example-wrapper">
+        <a href="{{ path('board_main', { 'board': boardName }) }}">{{ boardName }}</a>
+    </div>
+    <div class="create_post_form">
+        <form method="post" action="{{ path('createThread', { 'board' : boardName }) }}">
+            <input type="text" id="theme" name="theme">
+            <input type="submit" id="submit" name="submit"><br/>
+            <textarea id="text" name="text"></textarea>
+        </form>
+    </div>
+    <div class="posts">
+        {% for thread in threads %}
+            <div>
+                <div class="post_info">
+                    <div class="post_id" id="{{ thread.id }}">
+                        {{ thread.Id }}
+                    </div>
+                    <div class="post_time">
+                        {{ thread.FormatedCreatedAt }}
+                    </div>
+                </div>
+                {{ thread.Theme }}<br/>{{ thread.Text }}
+            </div>
+        {% endfor %}
+    </div>
+{% endblock %}
