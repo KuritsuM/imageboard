@@ -47,6 +47,11 @@ class Threads
     private $formated_created_at;
 
     /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $file1;
+
+    /**
      * @return mixed
      */
     public function getFormatedCreatedAt()
@@ -146,6 +151,18 @@ class Threads
     public function setCreatedAt(\DateTimeImmutable $created_at): self
     {
         $this->created_at = $created_at;
+
+        return $this;
+    }
+
+    public function getFile1(): ?string
+    {
+        return $this->file1;
+    }
+
+    public function setFile1(?string $file1): self
+    {
+        $this->file1 = $file1;
 
         return $this;
     }

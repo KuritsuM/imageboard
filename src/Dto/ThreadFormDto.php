@@ -3,6 +3,7 @@
 
 namespace App\Dto;
 
+use Symfony\Component\HttpFoundation\FileBag;
 use Symfony\Component\HttpFoundation\InputBag;
 use Symfony\Component\Validator\Constraints as Assert;
 
@@ -27,15 +28,19 @@ class ThreadFormDto
      */
     public $text;
 
+    public $files;
+
+
     /**
      * ThreadFormDto constructor.
      * @param String $board
      */
-    public function __construct(InputBag $query, string $board)
+    public function __construct(InputBag $query, string $board, FileBag $files)
     {
-        $this->theme = $query->get('theme');
-        $this->text = $query->get('text');
+        $this->theme = $query->get('thread')['theme'];
+        $this->text = $query->get('thread')['text'];
         $this->board = $board;
+        $this->files = $files;
     }
 
 

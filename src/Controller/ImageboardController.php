@@ -7,6 +7,7 @@ use App\Entity\Boards;
 use App\Entity\Threads;
 use App\Exceptions\ValidateException;
 use App\Form\BoardsType;
+use App\Form\ThreadType;
 use App\Repository\BoardsRepository;
 use App\Repository\ThreadsRepository;
 use App\Service\DtoService;
@@ -61,7 +62,36 @@ class ImageboardController extends AbstractController
     /**
      * @Route("/{board}", name="board_main")
      */
-    public function boards(Request $request, String $board, ThreadsRepository $threadsRepository) {
+    public function boards(Request $request, String $board, ThreadsRepository $threadsRepository, DtoService $dtoService) {
+        //$thread = new Threads();
+phpinfo();
+        $threadForm = $this->createForm(ThreadType::class, null);
+
+        $threadForm->handleRequest($request);
+
+        if ($threadForm->isSubmitted()) {
+            try {
+                $thread = $dtoService->makeThreadFromDto(
+                    new ThreadFormDto($request->request, $board, $request->files),
+                                      $this->getParameter('uploads_directory')
+                );
+
+
+
+                $em = $this->getDoctrine()->getManager();
+
+                $em->persist($thread);
+
+                $em->flush();
+
+                return $this->redirectToRoute('board_name', [ 'board' => $board]);
+            } catch (ValidateException $e) {
+                $this->json(array('ok'=>'notOk'));
+            } catch (\Exception $e) {
+                $this->json(array('ok'=>'notOk'));
+            }
+        }
+
         $threads = $threadsRepository->findByBoard($board);
 
         foreach ($threads as $thread) {
@@ -70,7 +100,8 @@ class ImageboardController extends AbstractController
 
         return $this->render('board/board.html.twig', [
             'boardName' => $board,
-            'threads' => $threads
+            'threads' => $threads,
+            'thread_form' => $threadForm->createView()
         ]);
     }
 
