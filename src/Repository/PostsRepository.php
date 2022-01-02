@@ -19,6 +19,13 @@ class PostsRepository extends ServiceEntityRepository
         parent::__construct($registry, Posts::class);
     }
 
+    public function findByThreadId(int $threadId) {
+        $query = $this->getEntityManager()->createQuery(
+            'SELECT p FROM App:Posts p WHERE p.thread = :threadId ORDER BY p.created_at ASC'
+        );
+        $query->setParameter('threadId', $threadId);
+        return $query->getResult();
+    }
     // /**
     //  * @return Posts[] Returns an array of Posts objects
     //  */

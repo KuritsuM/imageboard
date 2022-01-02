@@ -80,7 +80,7 @@
                     <div class="post_time">
                         {{ thread.FormatedCreatedAt }}
                     </div>
-                    <a class="response" href="#">Ответить</a>
+                    <a class="response" href="{{ path('thread_view', { 'board': boardName, 'thread_id': thread.id }) }}">Ответить</a>
                 </div>
                 {% if thread.Theme != null%}
                 <article class="post_text">{{ thread.Theme }}</article>

@@ -1,0 +1,107 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ boardName }}{% endblock %}
+
+{% block body %}
+    <style>
+        .example-wrapper { margin: 1em auto; max-width: 800px; width: 95%; font: 18px/1.5 sans-serif; }
+        .example-wrapper code { background: #F5F5F5; padding: 2px 6px; }
+
+        #textarea { }
+        .posts {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .post {
+            display: inline;
+            min-width: 300px;
+            flex-direction: column;
+            margin: 3px 5px 5px 5px;
+            background-color: #236e95;
+            color: #e0e0e0;
+            border-radius: 4px;
+            word-break: break-word;
+            word-wrap: break-word;
+        }
+
+        .post_info {
+            display: flex;
+            flex-direction: row;
+            padding: 5px;
+        }
+
+        .post_id {
+            margin-left: 5px;
+        }
+
+        .post_time {
+            margin-left: 7px;
+        }
+
+        .response {
+            text-decoration: none;
+            color: rgba(198, 129, 26, 0.84);
+        }
+
+        .post_text {
+            max-height: 200px;
+            text-align: center;
+            overflow: auto;
+            display: block;
+        }
+    </style>
+
+    <div class="example-wrapper">
+        <a href="{{ path('board_main', { 'board': boardName }) }}">{{ boardName }}</a>
+    </div>
+    <div id="thread" class="posts">
+        <div class="post">
+            <div class="post_info">
+                <div class="post_info">
+                    <div class="post_id" id="{{ thread.id }}">
+                        ID-треда: {{ thread.Id }}
+                    </div>
+                    <div class="post_time">
+                        {{ thread.FormatedCreatedAt }}
+                    </div>
+                    <a class="response" href="#">Ответить</a>
+                </div>
+                {% if thread.Theme != null %}
+                    <div class="post_text">{{ thread.Theme }}</div>
+                {% endif %}
+            </div>
+            <br/>
+            {% if thread.File1 != null %}
+                <img src="{{ asset('uploaded/') ~ thread.File1 }}" alt="{{ thread.File1 }}"/>
+            {% endif %}
+            <article class="post_text">{{ thread.Text }}</article>
+        </div>
+    </div>
+    <div id="posts" class="posts">
+        {% set postCounter = 1 %}
+        {% for post in posts -%}
+            <div class="post">
+                <div color="rgba(100,100,100,100)">{{ postCounter }}</div>
+                <div>{{ post.Id }}</div>
+                <div>{{ post.FormatedCreatedAt }}</div>
+                <div>{{ post.Theme }}</div>
+                <div>{{ post.Text }}</div>
+
+            </div>
+            {% set postCounter = postCounter + 1 %}
+        {%- endfor %}
+    </div>
+    {{ form(post_form) }}
+    {% if error != null %}
+        <div>
+            {{ error }}
+        </div>
+    {% endif %}
+
+    <script>
+        document.querySelector('form').addEventListener('submit', (e) => {
+           window.location.reload();
+        });
+    </script>
+{% endblock %}

@@ -4,11 +4,14 @@ namespace App\Controller;
 
 use App\Dto\ThreadFormDto;
 use App\Entity\Boards;
+use App\Entity\Posts;
 use App\Entity\Threads;
 use App\Exceptions\ValidateException;
 use App\Form\BoardsType;
+use App\Form\PostsType;
 use App\Form\ThreadType;
 use App\Repository\BoardsRepository;
+use App\Repository\PostsRepository;
 use App\Repository\ThreadsRepository;
 use App\Service\DtoService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -64,7 +67,6 @@ class ImageboardController extends AbstractController
      */
     public function boards(Request $request, String $board, ThreadsRepository $threadsRepository, DtoService $dtoService) {
         //$thread = new Threads();
-phpinfo();
         $threadForm = $this->createForm(ThreadType::class, null);
 
         $threadForm->handleRequest($request);
@@ -102,6 +104,47 @@ phpinfo();
             'boardName' => $board,
             'threads' => $threads,
             'thread_form' => $threadForm->createView()
+        ]);
+    }
+
+    /**
+     * @Route("/{board}/{thread_id}", name="thread_view")
+     */
+    public function threadsView(Request $request, string $board, int $thread_id) {
+        $thread = $this->getDoctrine()->getRepository(Threads::class)->find($thread_id);
+        $posts = $this->getDoctrine()->getRepository(Posts::class)->findByThreadId($thread_id);
+
+        $thread->setFormatedCreatedAt($thread->getCreatedAt()->format('d/m/Y H:i:s'));
+
+        foreach ($posts as $post) {
+            $post->setFormatedCreatedAt($post->getCreatedAt()->format('d/m/Y H:i:s'));
+        }
+
+        $postForm = $this->createForm(PostsType::class, null);
+
+        $postForm->handleRequest($request);
+
+        if ($postForm->isSubmitted() && $postForm->isValid()) {
+            $em = $this->getDoctrine()->getManager();
+
+            $post = $postForm->getData();
+            $post->setCreatedAt(new \DateTimeImmutable());
+            $post->setThread($thread);
+            $thread->addPost($post);
+
+            $em->persist($thread);
+            $em->persist($post);
+            $em->flush();
+
+            $this->redirectToRoute('thread_view', ['board' => $board, 'thread_id' => $thread_id]);
+        }
+
+        return $this->render('board/thread_view.html.twig', [
+            'boardName' => $board,
+            'thread' => $thread,
+            'posts' => $posts,
+            'post_form' => $postForm->createView(),
+            'error' => null
         ]);
     }
 
