@@ -10,7 +10,7 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * @ORM\Entity(repositoryClass=ThreadsRepository::class)
  */
-class Threads
+class Threads implements \JsonSerializable
 {
     /**
      * @ORM\Id
@@ -165,5 +165,16 @@ class Threads
         $this->file1 = $file1;
 
         return $this;
+    }
+
+    public function jsonSerialize(): array
+    {
+        return [
+            'id' => $this->id,
+            'theme' => $this->theme,
+            'text' => $this->text,
+            'created_at' => $this->created_at->format('d/m/Y H:i:s'),
+            //'board' => $this->board
+        ];
     }
 }

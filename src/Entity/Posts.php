@@ -10,7 +10,7 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * @ORM\Entity(repositoryClass=PostsRepository::class)
  */
-class Posts
+class Posts implements \JsonSerializable
 {
     /**
      * @ORM\Id
@@ -175,5 +175,15 @@ class Posts
         $this->created_at = $created_at;
 
         return $this;
+    }
+
+    public function jsonSerialize(): array
+    {
+        return [
+            'id' => $this->id,
+            'created_at' => $this->created_at->format('d/m/Y H:i:s'),
+            'theme' => $this->theme,
+            'text' => $this->text
+        ];
     }
 }
