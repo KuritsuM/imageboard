@@ -4,7 +4,9 @@
 namespace App\Service;
 
 
+use App\Dto\PostFormDto;
 use App\Dto\ThreadFormDto;
+use App\Entity\Posts;
 use App\Entity\Threads;
 use App\Exceptions\ValidateException;
 use App\Repository\BoardsRepository;
@@ -20,14 +22,37 @@ class DtoService
 
     private BoardsRepository $boardsRepository;
 
+    private ThreadsRepository $threadsRepository;
+
     /**
      * DtoService constructor.
      * @param ValidatorInterface $validator
      */
-    public function __construct(ValidatorInterface $validator, BoardsRepository $boardsRepository)
+    public function __construct(ValidatorInterface $validator, BoardsRepository $boardsRepository, ThreadsRepository $threadsRepository)
     {
+        $this->threadsRepository = $threadsRepository;
         $this->validator = $validator;
         $this->boardsRepository = $boardsRepository;
+    }
+
+    public function makePostFromDto(PostFormDto $dto) {
+        $errors = $this->validator->validate($dto);
+
+        if (count($errors) > 0) {
+            throw new ValidateException((string) $errors);
+        }
+
+        $post = new Posts();
+        $post->setText($dto->text);
+        $post->setTheme($dto->theme);
+
+        $thread = $this->threadsRepository->find($dto->threadId);
+
+        $post->setThread($thread);
+        $thread->addPost($post);
+        $post->setCreatedAt(new \DateTimeImmutable());
+
+        return $post;
     }
 
     public function makeThreadFromDto(ThreadFormDto $dto, $directory) {
