@@ -174,6 +174,7 @@ class Threads implements \JsonSerializable
             'theme' => $this->theme,
             'text' => $this->text,
             'created_at' => $this->created_at->format('d/m/Y H:i:s'),
+            'file1' => $this->file1
             //'board' => $this->board
         ];
     }

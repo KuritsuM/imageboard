@@ -28,19 +28,19 @@ class ThreadFormDto
      */
     public $text;
 
-    public $files;
+    public $filenames;
 
 
     /**
      * ThreadFormDto constructor.
      * @param String $board
      */
-    public function __construct(InputBag $query, string $board, FileBag $files)
+    public function __construct(string $theme, string $text, string $board, array $filenames)
     {
-        $this->theme = $query->get('thread')['theme'];
-        $this->text = $query->get('thread')['text'];
+        $this->theme = $theme;
+        $this->text = $text;
         $this->board = $board;
-        $this->files = $files;
+        $this->filenames = $filenames;
     }
 
 

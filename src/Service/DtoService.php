@@ -51,11 +51,25 @@ class DtoService
         $post->setThread($thread);
         $thread->addPost($post);
         $post->setCreatedAt(new \DateTimeImmutable());
+        foreach ($dto->filenames as $filename) {
+            $post->setFile1($filename);
+        }
 
         return $post;
     }
 
-    public function makeThreadFromDto(ThreadFormDto $dto, $directory) {
+    public function moveFiles($file, $directory) {
+        $filename = md5(uniqid()).'.'.$file->getClientOriginalExtension();
+
+        $file->move(
+            $directory,
+            $filename
+        );
+
+        return $filename;
+    }
+
+    public function makeThreadFromDto(ThreadFormDto $dto) {
         $errors = $this->validator->validate($dto);
 
         if (count($errors) > 0) {
@@ -63,7 +77,7 @@ class DtoService
         }
 
 
-        $file = $dto->files->get('thread')['file1'];
+        /*$file = $dto->files->get('thread')['file1'];
 
         //dd($file);
 
@@ -72,7 +86,7 @@ class DtoService
         $file->move(
             $directory,
             $filename
-        );
+        );*/
 
 
         $thread = new Threads();
@@ -80,7 +94,10 @@ class DtoService
         $thread->setText($dto->text);
         $thread->setBoard($this->boardsRepository->findByBoardName($dto->board));
         $thread->setTheme($dto->theme);
-        $thread->setFile1($filename);
+
+        foreach ($dto->filenames as $filename) {
+            $thread->setFile1($filename);
+        }
 
         return $thread;
     }

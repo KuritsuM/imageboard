@@ -20,6 +20,8 @@ class PostFormDto implements \JsonSerializable
 
     public $board;
 
+    public $filenames;
+
     /**
      * PostFormDto constructor.
      * @param $name
@@ -28,13 +30,14 @@ class PostFormDto implements \JsonSerializable
      * @param $threadId
      * @param $board
      */
-    public function __construct($name, $theme, $text, $board, $threadId)
+    public function __construct($name, $theme, $text, $board, $threadId, $filenames)
     {
         $this->name = $name;
         $this->theme = $theme;
         $this->text = $text;
         $this->board = $board;
         $this->threadId = $threadId;
+        $this->filenames = $filenames;
     }
 
 

@@ -51,6 +51,11 @@ class Posts implements \JsonSerializable
 
     private $formatedCreatedAt;
 
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $file1;
+
     public function __construct()
     {
         $this->replies = new ArrayCollection();
@@ -183,7 +188,20 @@ class Posts implements \JsonSerializable
             'id' => $this->id,
             'created_at' => $this->created_at->format('d/m/Y H:i:s'),
             'theme' => $this->theme,
-            'text' => $this->text
+            'text' => $this->text,
+            'file1' => $this->file1
         ];
+    }
+
+    public function getFile1(): ?string
+    {
+        return $this->file1;
+    }
+
+    public function setFile1(?string $file1): self
+    {
+        $this->file1 = $file1;
+
+        return $this;
     }
 }

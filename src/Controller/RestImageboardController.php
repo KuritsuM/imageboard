@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Dto\PostFormDto;
+use App\Dto\ThreadFormDto;
 use App\Entity\Posts;
 use App\Entity\Threads;
 use App\Exceptions\ValidateException;
@@ -10,6 +11,7 @@ use App\Service\DtoService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\Routing\Annotation\Route;
 
 class RestImageboardController extends AbstractController
@@ -34,6 +36,54 @@ class RestImageboardController extends AbstractController
      * @Route("/api/posts/", methods={"OPTIONS"})
      */
     public function options2(Request $request): Response
+    {
+        $response = new Response();
+
+        $response->headers->set('Access-Control-Allow-Methods', 'OPTIONS, GET, POST, DELETE, PUT, PATCH');
+        $response->headers->set("Access-Control-Allow-Credentials", "true");
+        $response->headers->set("Access-Control-Allow-Headers",
+            "Access-Control-Allow-Headers, Origin,Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers");
+        $response->headers->set('Access-Control-Allow-Origin', '*');
+
+        return $response;
+    }
+
+    /**
+     * @Route("/file/", methods={"OPTIONS"})
+     */
+    public function options3(Request $request): Response
+    {
+        $response = new Response();
+
+        $response->headers->set('Access-Control-Allow-Methods', 'OPTIONS, GET, POST, DELETE, PUT, PATCH');
+        $response->headers->set("Access-Control-Allow-Credentials", "true");
+        $response->headers->set("Access-Control-Allow-Headers",
+            "Access-Control-Allow-Headers, Origin,Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers");
+        $response->headers->set('Access-Control-Allow-Origin', '*');
+
+        return $response;
+    }
+
+    /**
+     * @Route("api/file/", methods={"OPTIONS"})
+     */
+    public function options4(Request $request): Response
+    {
+        $response = new Response();
+
+        $response->headers->set('Access-Control-Allow-Methods', 'OPTIONS, GET, POST, DELETE, PUT, PATCH');
+        $response->headers->set("Access-Control-Allow-Credentials", "true");
+        $response->headers->set("Access-Control-Allow-Headers",
+            "Access-Control-Allow-Headers, Origin,Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers");
+        $response->headers->set('Access-Control-Allow-Origin', '*');
+
+        return $response;
+    }
+
+    /**
+     * @Route("/api/threads/", methods={"OPTIONS"})
+     */
+    public function options5(Request $request): Response
     {
         $response = new Response();
 
@@ -74,7 +124,7 @@ class RestImageboardController extends AbstractController
         $response = [
             'board' => $thread->getBoard()->getName(),
             'thread' => $thread,
-            'posts' => $posts
+            'posts' => $posts,
         ];
 
         return $this->jsonResponse($response);
@@ -92,7 +142,14 @@ class RestImageboardController extends AbstractController
 
 
         //$request->request->get();
-        $dto = new PostFormDto($request['name'], $request['theme'], $request['text'], $request['board'], $request['threadId']);
+        $dto = new PostFormDto(
+            $request['name'],
+            $request['theme'],
+            $request['text'],
+            $request['board'],
+            $request['threadId'],
+            $request['filenames']
+        );
 
         try {
             $post = $dtoService->makePostFromDto($dto);
@@ -114,6 +171,68 @@ class RestImageboardController extends AbstractController
         //return $this->jsonResponse(['request' => $dto]);
     }
 
+    /**
+     * @param Request $request
+     * @param DtoService $dtoService
+     * @return \Symfony\Component\HttpFoundation\JsonResponse
+     * @Route("api/threads/", name="create_thread", methods={"POST"})
+     */
+    public function createThread(Request $request, DtoService $dtoService) {
+        $request = json_decode($request->getContent(), true, JSON_UNESCAPED_SLASHES);
+
+        try {
+            $thread = $dtoService->makeThreadFromDto(new ThreadFormDto(
+                $request['theme'],
+                $request['text'],
+                $request['board'],
+                $request['filenames']));
+            $em = $this->getDoctrine()->getManager();
+            $em->persist($thread);
+            $em->flush();
+
+            return $this->jsonResponse($thread);
+        } catch (ValidateException $exception) {
+            return $this->jsonResponse($exception);
+        }
+    }
+
+    /**
+     * @Route("/file/{file}", name="get_file", methods={"GET"})
+     */
+    public function getFile(string $file) {
+        return $this->file($this->getParameter('uploads_directory').$file,
+            $file,
+            ResponseHeaderBag::DISPOSITION_INLINE);
+    }
+
+    /**
+     * @Route("api/file/", name="upload_files", methods={"POST"})
+     */
+    public function uploadFiles(Request $request, DtoService $dtoService) {
+
+        $filesNames = [];
+        for ($i = 0; $i < $request->request->count(); ++$i) {
+            $filesNames[$i] = $request->request->get($i);
+        }
+
+        $i = 0;
+        $newFilenames = [];
+        foreach ($request->files as $file) {
+            $newFilename = $dtoService->moveFiles($file, $this->getParameter('uploads_directory'));
+
+            //$newFilenames[$filesNames[$i]] = $newFilename;
+            $newFilenames[$i] = $newFilename;
+        }
+
+        return $this->jsonResponse(['filenames' => $newFilenames]);
+    }
+
+    /**
+     * @param $data
+     * @param int $status
+     * @param null $errorMsg
+     * @return \Symfony\Component\HttpFoundation\JsonResponse
+     */
     private function jsonResponse($data, $status = 200, $errorMsg = null) {
         if ($status == 200) {
             $jsonArray = [
