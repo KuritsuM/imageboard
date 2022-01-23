@@ -3,16 +3,47 @@ security:
     # https://symfony.com/doc/current/security.html#registering-the-user-hashing-passwords
     password_hashers:
         Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface: 'auto'
+        App\Entity\Moderator:
+            algorithm: auto
+            cost: 12
+
     # https://symfony.com/doc/current/security.html#loading-the-user-the-user-provider
     providers:
-        users_in_memory: { memory: null }
+        # used to reload user from session & other features (e.g. switch_user)
+        app_user_provider:
+            entity:
+                class: App\Entity\Moderator
+                property: username
     firewalls:
-        dev:
-            pattern: ^/(_(profiler|wdt)|css|images|js)/
-            security: false
-        main:
-            lazy: true
-            provider: users_in_memory
+
+        #dev:
+         #   pattern: ^/(_(profiler|wdt)|css|images|js)/
+          #  security: false
+
+        login:
+            pattern: ^/api/login_check
+            stateless: true
+            json_login:
+                check_path: /api/login_check
+                success_handler: lexik_jwt_authentication.handler.authentication_success
+                failure_handler: lexik_jwt_authentication.handler.authentication_failure
+
+        api:
+            #form_login: ~
+            pattern: ^/api
+            stateless: true
+            jwt: ~
+
+        refresh:
+            pattern: ^/api/login/refresh
+            stateless: true
+            #guard:
+             #   authenticators:
+              #      - lexik_jwt_authentication.jwt_token_authenticator
+
+        #main:
+         #   lazy: true
+          #  provider: app_user_provider
 
             # activate different ways to authenticate
             # https://symfony.com/doc/current/security.html#the-firewall
@@ -23,8 +54,11 @@ security:
     # Easy way to control access for large sections of your site
     # Note: Only the *first* access control that matches will be used
     access_control:
-        # - { path: ^/admin, roles: ROLE_ADMIN }
-        # - { path: ^/profile, roles: ROLE_USER }
+        - { path: ^/api/login_check, roles: PUBLIC_ACCESS }
+        - { path: ^/token/refresh, roles: PUBLIC_ACCESS }
+        - { path: ^/api/login/refresh, roles: PUBLIC_ACCESS}
+        - { path: ^/api, roles: ROLE_USER }
+        - { path: ^/, roles: PUBLIC_ACCESS }
 
 when@test:
     security:
@@ -35,6 +69,6 @@ when@test:
             # reduces the work factor to the lowest possible values.
             Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface:
                 algorithm: auto
-                cost: 4 # Lowest possible value for bcrypt
+                cost: 12
                 time_cost: 3 # Lowest possible value for argon
                 memory_cost: 10 # Lowest possible value for argon

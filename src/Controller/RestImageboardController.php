@@ -16,85 +16,7 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class RestImageboardController extends AbstractController
 {
-    /**
-     * @Route("/api/*", methods={"OPTIONS"})
-     */
-    public function options(Request $request): Response
-    {
-        $response = new Response();
 
-        $response->headers->set('Access-Control-Allow-Methods', 'OPTIONS, GET, POST, DELETE, PUT, PATCH');
-        $response->headers->set("Access-Control-Allow-Credentials", "true");
-        $response->headers->set("Access-Control-Allow-Headers",
-            "Access-Control-Allow-Headers, Origin,Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers");
-        $response->headers->set('Access-Control-Allow-Origin', '*');
-
-        return $response;
-    }
-
-    /**
-     * @Route("/api/posts/", methods={"OPTIONS"})
-     */
-    public function options2(Request $request): Response
-    {
-        $response = new Response();
-
-        $response->headers->set('Access-Control-Allow-Methods', 'OPTIONS, GET, POST, DELETE, PUT, PATCH');
-        $response->headers->set("Access-Control-Allow-Credentials", "true");
-        $response->headers->set("Access-Control-Allow-Headers",
-            "Access-Control-Allow-Headers, Origin,Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers");
-        $response->headers->set('Access-Control-Allow-Origin', '*');
-
-        return $response;
-    }
-
-    /**
-     * @Route("/file/", methods={"OPTIONS"})
-     */
-    public function options3(Request $request): Response
-    {
-        $response = new Response();
-
-        $response->headers->set('Access-Control-Allow-Methods', 'OPTIONS, GET, POST, DELETE, PUT, PATCH');
-        $response->headers->set("Access-Control-Allow-Credentials", "true");
-        $response->headers->set("Access-Control-Allow-Headers",
-            "Access-Control-Allow-Headers, Origin,Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers");
-        $response->headers->set('Access-Control-Allow-Origin', '*');
-
-        return $response;
-    }
-
-    /**
-     * @Route("api/file/", methods={"OPTIONS"})
-     */
-    public function options4(Request $request): Response
-    {
-        $response = new Response();
-
-        $response->headers->set('Access-Control-Allow-Methods', 'OPTIONS, GET, POST, DELETE, PUT, PATCH');
-        $response->headers->set("Access-Control-Allow-Credentials", "true");
-        $response->headers->set("Access-Control-Allow-Headers",
-            "Access-Control-Allow-Headers, Origin,Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers");
-        $response->headers->set('Access-Control-Allow-Origin', '*');
-
-        return $response;
-    }
-
-    /**
-     * @Route("/api/threads/", methods={"OPTIONS"})
-     */
-    public function options5(Request $request): Response
-    {
-        $response = new Response();
-
-        $response->headers->set('Access-Control-Allow-Methods', 'OPTIONS, GET, POST, DELETE, PUT, PATCH');
-        $response->headers->set("Access-Control-Allow-Credentials", "true");
-        $response->headers->set("Access-Control-Allow-Headers",
-            "Access-Control-Allow-Headers, Origin,Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers");
-        $response->headers->set('Access-Control-Allow-Origin', '*');
-
-        return $response;
-    }
 
     /**
      * @Route("/api/threads/{board}", name="rest_imageboard", methods={ "GET" })
@@ -228,6 +150,13 @@ class RestImageboardController extends AbstractController
     }
 
     /**
+     * @Route("/test/", name="test", methods={"GET"})
+     */
+    public function testTest() {
+        return new Response('<span style="color:rgba(155,155,155,100)">asdag</span>');
+    }
+
+    /**
      * @param $data
      * @param int $status
      * @param null $errorMsg
@@ -240,11 +169,7 @@ class RestImageboardController extends AbstractController
                 'data' => $data,
             ];
 
-            return $this->json($jsonArray, 200, [
-                'Access-Control-Allow-Origin' => '*',
-                'Access-Control-Allow-Methods' => 'POST, GET, PUT, DELETE, PATCH, OPTIONS',
-                'Access-Control-Max-Age' => 0
-            ]);
+            return $this->json($jsonArray, 200);
         }
         else {
             $jsonArray = [
@@ -253,11 +178,7 @@ class RestImageboardController extends AbstractController
                 //'data' => $data,
             ];
 
-            return $this->json($jsonArray, 200, [
-                'Access-Control-Allow-Origin' => '*',
-                'Access-Control-Allow-Methods' => 'POST, GET, PUT, DELETE, PATCH, OPTIONS',
-                'Access-Control-Max-Age' => 0
-            ]);
+            return $this->json($jsonArray, 200);
         }
     }
 }
