@@ -67,14 +67,11 @@ class Moderator implements UserInterface, PasswordAuthenticatedUserInterface
 
     /**
      * @see UserInterface
+     * TODO: rewrite to ManyToMany table with roles!
      */
     public function getRoles(): array
     {
-        $roles = $this->roles;
-        // guarantee every user at least has ROLE_USER
-        $roles[] = 'ROLE_USER';
-
-        return array_unique($roles);
+        return ['ROLE_USER', 'ROLE_PO'];
     }
 
     public function setRoles(array $roles): self

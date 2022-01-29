@@ -53,15 +53,14 @@ class ModeratorRepository extends ServiceEntityRepository implements PasswordUpg
     }
     */
 
-    /*
-    public function findOneBySomeField($value): ?Moderator
+
+    public function findOneByUsername($username): ?Moderator
     {
         return $this->createQueryBuilder('m')
-            ->andWhere('m.exampleField = :val')
-            ->setParameter('val', $value)
+            ->andWhere('m.username = :val')
+            ->setParameter('val', $username)
             ->getQuery()
             ->getOneOrNullResult()
         ;
     }
-    */
 }

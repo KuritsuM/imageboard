@@ -8,6 +8,8 @@ use App\Entity\Posts;
 use App\Entity\Threads;
 use App\Exceptions\ValidateException;
 use App\Service\DtoService;
+use App\Service\UserService;
+use http\Client\Curl\User;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -150,10 +152,34 @@ class RestImageboardController extends AbstractController
     }
 
     /**
-     * @Route("/test/", name="test", methods={"GET"})
+     * @Route("/api/posts/delete/{id}", name="delete_posts", methods={"DELETE"})
      */
-    public function testTest() {
-        return new Response('<span style="color:rgba(155,155,155,100)">asdag</span>');
+    public function deletePost(Request $request, UserService $userService, $id) {
+        $user = $userService->getUser($request->headers->get('authorization'));
+
+        $postsToDelete = $request->request->get('posts');
+
+        $em = $this->getDoctrine()->getManager();
+        $postsRepository = $em->getRepository(Posts::class);
+
+        $post = $postsRepository->find($id);
+
+        if ($userService->isCanDeleteCurrentPost($post)) {
+            $em->remove($post);
+        };
+
+        $em->flush();
+
+        return $this->jsonResponse($post);
+    }
+
+    /**
+     * @Route("/api/getuser", name="get_user", methods={"GET"})
+     */
+    public function getUserInfo(Request $request, UserService $userService) {
+        $user = $userService->getUser($request->headers->get('authorization'));
+
+        return $this->jsonResponse(['username' => $user->getUserIdentifier(), 'roles' => $user->getRoles()]);
     }
 
     /**
